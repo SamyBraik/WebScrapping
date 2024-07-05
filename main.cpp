@@ -13,7 +13,6 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) 
     try {
         s->append((char*)contents, newLength);
     } catch (std::bad_alloc& e) {
-        // Gérer le problème de mémoire
         return 0;
     }
     return newLength;
@@ -52,40 +51,57 @@ std::vector<std::string> split (const std::string &s, char delim) {
     return result;
 }
 
-std::vector<double> open(const std::string ticker, const std::string interval, const std::string key){
-    std::string data = fetchingData(ticker,interval,key);
-    std::vector<std::string> firstSplit = split(data,'{');
-    std::vector<double> openPrice{};
-    for (int i=0;i<=(firstSplit.size()-4);i++){
-        std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
-        openPrice.push_back(std::stod(secondSplit[7]));
-    }
-    return openPrice;
-}
+class Stock {
+    private:
+        const std::string ticker;
+        const std::string key;
+    public:
+        Stock(std::string ticker,std::string key) : ticker(ticker), key(key) {}
 
-std::vector<double> close(const std::string ticker, const std::string interval, const std::string key){
-    std::string data = fetchingData(ticker,interval,key);
-    std::vector<std::string> firstSplit = split(data,'{');
-    std::vector<double> openPrice{};
-    for (int i=0;i<=(firstSplit.size()-4);i++){
-        std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
-        openPrice.push_back(std::stod(secondSplit[19]));
+        std::vector<double> open(const std::string interval){
+        std::string data = fetchingData(ticker,interval,key);
+        std::vector<std::string> firstSplit = split(data,'{');
+        std::vector<double> openPrice{};
+        for (int i=0;i<=(firstSplit.size()-4);i++){
+            std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
+            openPrice.push_back(std::stod(secondSplit[7]));
+        }
+        openPrice.pop_back();
+        return openPrice;
     }
-    return openPrice;
-}
+
+    
+    std::vector<double> close(const std::string interval){
+        std::string data = fetchingData(ticker,interval,key);
+        std::vector<std::string> firstSplit = split(data,'{');
+        std::vector<double> closePrice{};
+        for (int i=0;i<=(firstSplit.size()-4);i++){
+            std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
+            closePrice.push_back(std::stod(secondSplit[19]));
+        }
+        closePrice.pop_back();
+        return closePrice;
+    }
+
+    std::string raw(const std::string interval){
+        std::string data = fetchingData(ticker,interval,key);
+        return data;
+        
+    }
+};
+
 
 
 int main(){
     std::string key = "***";
     std::string ticker = "GOOG";
     std::string interval = "1day";
-    std::string data = fetchingData(ticker,interval,key);
-    std::vector splited = split(data,'{');
-    std::vector resplited = split(splited[32],'"');
-    std::vector<double> price = open(ticker,interval,key);
-    for (auto i : price) std::cout << i << std::endl;
-   
-
-
+    
+    Stock GOOG(ticker, key);
+    std::vector prices = GOOG.close("1day");
+    for(int i=0;i<= prices.size();i++){
+        std::cout<<prices[i]<<std::endl;
+    }
+    
     return 0;
 }
