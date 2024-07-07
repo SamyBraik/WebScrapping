@@ -138,8 +138,8 @@ class Stock {
         std::vector<double> dailyReturns(const std::string interval, const std::string start, const std::string end){
             std::vector<double> prices = close(interval,start,end);
             std::vector<double> returns;
-            for(int i=0;i<=prices.size()-1;i++){
-                returns.push_back((prices[i+1]-prices[i])/prices[i]);
+            for(int i=1;i<=prices.size();i++){
+                returns.push_back((prices[i]-prices[i-1])/prices[i-1]);
             }
             return returns;
         }
