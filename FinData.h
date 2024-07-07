@@ -90,10 +90,10 @@ class Stock {
         }
 
         std::vector<double> open(const std::string interval, const std::string start, const std::string end){
-        std::string spec = "times_series";
+        std::string spec = "time_series";
         std::string data = fetchingData(spec,ticker,interval,key,start,end);
         std::vector<std::string> firstSplit = split(data,'{');
-        std::vector<double> openPrice{};
+        std::vector<double> openPrice;
         for (int i=0;i<=(firstSplit.size()-4);i++){
             std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
             openPrice.push_back(std::stod(secondSplit[7]));
@@ -103,10 +103,10 @@ class Stock {
         }
     
         std::vector<double> close(const std::string interval, const std::string start, const std::string end){
-            std::string spec = "times_series";
+            std::string spec = "time_series";
             std::string data = fetchingData(spec,ticker,interval,key,start,end);
             std::vector<std::string> firstSplit = split(data,'{');
-            std::vector<double> closePrice{};
+            std::vector<double> closePrice;
             for (int i=0;i<=(firstSplit.size()-4);i++){
                 std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
                 closePrice.push_back(std::stod(secondSplit[19]));
@@ -115,8 +115,21 @@ class Stock {
             return closePrice;
         }
 
+        std::vector<int> volume(const std::string interval, const std::string start, const std::string end){
+            std::string spec = "time_series";
+            std::string data = fetchingData(spec,ticker,interval,key,start,end);
+            std::vector<std::string> firstSplit = split(data,'{');
+            std::vector<int> volu;
+            for (int i=0;i<=(firstSplit.size()-4);i++){
+                std::vector<std::string> secondSplit = split(firstSplit[i+3],'"');
+                volu.push_back(std::stod(secondSplit[23]));
+            }
+            volu.pop_back();
+            return volu;
+        }
+
         std::string raw(const std::string interval, const std::string start, const std::string end){
-            std::string spec = "times_series";
+            std::string spec = "time_series";
             std::string data = fetchingData(spec,ticker,interval,key,start,end);
             return data;
         
